@@ -1,0 +1,75 @@
+
+'This function can be used to run and export files to a specific location
+
+Function New_Business__TROP()
+On Error GoTo New_Business__TROP_Err
+
+
+DoCmd.SetWarnings False    
+DoCmd.OpenQuery "New Business by Effective Data_TROP_report_final", acViewNormal, acEdit
+DoCmd.OpenReport "New Business by Effective Data_TROP_report", acViewReport, "", "", acNormal
+DoCmd.OutputTo acOutputReport, "New Business_report", "PDFFormat(*.pdf)", "[file path]", False, "", , acExportQualityPrint
+DoCmd.OutputTo acOutputQuery, "New Business_Data", "ExcelWorkbook(*.xlsx)", "[file path]", False, "", , acExportQualityScreen
+
+New_Business__TROP_Exit:
+    Exit Function
+    
+New_Business__TROP_Err:
+MsgBox Error$
+Resume New_Business__TROP_Exit
+    
+End Function
+
+
+'this Sub emails the above generated files.	    
+	    
+Sub SendMail()
+Dim outl As outlook.Application
+Set outl = New outlook.Application
+Dim mi As outlook.MailItem
+Set mi = outl.CreateItem(olMailItem)
+mi.Body = "All," & vbNewLine & vbNewLine & _
+"Please refer to the above-attached Reports." & vbNewLine & vbNewLine & 
+"Please, let me know if you have any questions or concerns." & vbNewLine & vbNewLine & "Regards,"
+mi.Subject = "New Business and Renewals & Terminations' Reports"
+mi.To = "jbektasevic@kesa.org;email2;email3"
+mi.Attachments.Add ("[file path]")
+mi.Attachments.Add "[file path]"
+mi.Attachments.Add "[file path]"
+mi.Send
+Set mi = Nothing
+Set outl = Nothing
+End Sub
+
+
+'Create this as a seperate VBS file. you can call it with bat file. It should run your reports and email them automatically.
+
+On Error Resume Next
+Call Do_Something
+
+'________________
+Sub Do_Something()
+
+    Set objAccess = CreateObject("Access.Application")
+        If Not objAccess Is Nothing Then
+	        With objAccess
+		            .OpenCurrentDatabase "[database path", False
+			    .DoCmd.RunMacro "Append"
+		            .Run ("New_Business__TROP") '//A public function. same name as the function above
+		    	    .Run ("SendMail")  'Same name as the Sub above
+				                
+	        End With
+    End If
+
+    'Close DB and quit
+    If Not objAccess Is Nothing Then
+       With objAccess
+            .CloseCurrentDatabase
+            .Quit
+       End With
+    End If
+
+End Sub
+
+
+
