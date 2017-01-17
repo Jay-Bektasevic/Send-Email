@@ -142,7 +142,7 @@ ggmap(louisville) +
   labs(
     x = "Longitude", 
     y = "Latitude", 
-    title = "Location history data points around Münster",
+    title = "Location history data points around Louisville",
     subtitle = "Color scale shows accuracy (low: blue, high: red)",
     caption = "\nThis bin plot shows recorded positions 
     and their accuracy in and around Louisville")
